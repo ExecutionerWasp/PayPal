@@ -1,25 +1,22 @@
 package org.reflect;
 
+import lombok.NonNull;
 import org.model.annotation.AccessField;
 import org.exception.AccessRequiredFieldsException;
 import org.model.annotation.FieldType;
 
-import java.beans.ConstructorProperties;
 import java.lang.reflect.Field;
 import java.util.*;
 
 public final class FieldsResolver {
-
     private final Map<FieldType, Field>
             clientRequiredFields = new HashMap<>();
-    private Object client;
+    private Class<?> clientClass;
 
-    @ConstructorProperties("pay-pal-client")
-    public FieldsResolver(Object client) throws AccessRequiredFieldsException {
-        Objects.requireNonNull(client);
-        this.client = client;
+    public FieldsResolver(@NonNull Object clientClass) throws AccessRequiredFieldsException {
+        this.clientClass = clientClass.getClass();
         for (Field f :
-                client.getClass().getDeclaredFields()) {
+                clientClass.getClass().getDeclaredFields()) {
             if (f.isAnnotationPresent(AccessField.class)){
                 if (!clientRequiredFields.containsKey(f.getAnnotation(AccessField.class).value())){
                     f.setAccessible(true);
@@ -45,8 +42,25 @@ public final class FieldsResolver {
         }
     }
 
-    public Object getFieldObject(FieldType fieldType) throws IllegalAccessException {
-        Objects.requireNonNull(client);
-        return clientRequiredFields.get(fieldType).get(client);
+    public Object getFieldsValue(
+            @NonNull FieldType fieldType,
+            @NonNull Object instance
+    ) throws IllegalAccessException
+    {
+        assert(instance.getClass() == clientClass);
+        return clientRequiredFields.get(fieldType).get(instance);
+    }
+
+    public List<Object> getFieldsValues(@NonNull Object instance){
+        List<Object> values = new ArrayList<>();
+            Arrays.asList(FieldType.values()).forEach(
+                    fieldType -> {
+                        try {
+                            values.add(getFieldsValue(fieldType, instance));
+                        } catch (IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    });
+        return values;
     }
 }

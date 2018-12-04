@@ -10,7 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UserPayPal implements Serializable {
+public class ClientPayPal implements Serializable {
     @AccessField(FieldType.ID)
     private String id;
 

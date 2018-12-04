@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class PaymentModel implements Serializable {
+public class PaymentManager implements Serializable {
     //intent: sale
     private Payer payer;
     //method: paypal
@@ -18,7 +18,7 @@ public class PaymentModel implements Serializable {
     private RedirectUrls redirectUrls;
     private List<Transaction> transactions = new ArrayList<>();
 
-    public PaymentModel(
+    public PaymentManager(
             @NonNull String intent,
             @NonNull String method)
     {
@@ -28,7 +28,7 @@ public class PaymentModel implements Serializable {
         payment = this.build(intent);
     }
 
-    public PaymentModel(
+    public PaymentManager(
             @NonNull String intent,
             @NonNull String method,
             @NonNull String cancelUrl,
@@ -41,7 +41,7 @@ public class PaymentModel implements Serializable {
         payment      = this.build(intent);
     }
 
-    public PaymentModel(
+    public PaymentManager(
             @NonNull List<Transaction> transactions,
             @NonNull Payer payer,
             @NonNull Payment payment,
