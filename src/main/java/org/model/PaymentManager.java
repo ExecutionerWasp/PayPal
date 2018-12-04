@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class PaymentManager implements Serializable {
-    //intent: sale
     private Payer payer;
-    //method: paypal
     private Payment payment;
     private RedirectUrls redirectUrls;
     private List<Transaction> transactions = new ArrayList<>();

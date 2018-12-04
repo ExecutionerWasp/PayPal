@@ -4,8 +4,10 @@ import com.paypal.base.ConnectionManager;
 import org.cnfg.PayPalConfig;
 import org.exception.AccessRequiredFieldsException;
 import org.model.PaymentManager;
+import org.model.annotation.MetaDate;
 import org.reflect.FieldsResolver;
 
+@MetaDate
 public final class PayPalApi {
     private final String METHOD = "paypal";
     private final String INTENT = "order";
