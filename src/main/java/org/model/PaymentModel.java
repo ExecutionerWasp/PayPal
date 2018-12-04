@@ -1,14 +1,16 @@
 package org.model;
 
 import com.paypal.api.payments.*;
+import com.paypal.base.rest.APIContext;
+import com.paypal.base.rest.PayPalRESTException;
 import lombok.NonNull;
 
-import javax.management.ConstructorParameters;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class PaymentModel {
+public class PaymentModel implements Serializable {
     //intent: sale
     private Payer payer;
     //method: paypal
@@ -16,7 +18,6 @@ public class PaymentModel {
     private RedirectUrls redirectUrls;
     private List<Transaction> transactions = new ArrayList<>();
 
-    @ConstructorParameters({"intent","paypal"})
     public PaymentModel(
             @NonNull String intent,
             @NonNull String method)
@@ -52,8 +53,11 @@ public class PaymentModel {
         this.redirectUrls = redirectUrls;
     }
 
+    public Payment sand(@NonNull APIContext apiContext) throws PayPalRESTException {
+        return payment.create(apiContext);
+    }
+
     public Payment build(@NonNull String intent){
-        Objects.requireNonNull(intent);
         Objects.requireNonNull(payer);
         Objects.requireNonNull(transactions);
 

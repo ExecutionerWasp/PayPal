@@ -4,17 +4,19 @@ import lombok.*;
 import org.model.annotation.AccessField;
 import org.model.annotation.FieldType;
 
+import java.io.Serializable;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UserPayPal {
+public class UserPayPal implements Serializable {
     @AccessField(FieldType.ID)
-    @NonNull private String id;
+    private String id;
 
     @AccessField(FieldType.TOKEN)
-    @NonNull private String accessToken;
+    private String accessToken;
 
     @AccessField(FieldType.SECRET)
-    @NonNull private String accessSecret;
+    private String accessSecret;
 }
