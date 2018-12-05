@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MetaDate {
+public @interface PayPalClient {
     String method() default "paypal";
     String intent() default "order";
 }

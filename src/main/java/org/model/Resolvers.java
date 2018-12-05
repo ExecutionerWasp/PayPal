@@ -1,4 +1,4 @@
-package org.reflect;
+package org.model;
 
 import lombok.NonNull;
 
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-final class Parser {
+public final class Resolvers {
     static List<Field> getAnnotatedFields(
             @NonNull Class<?> clazz,
             @NonNull Class<? extends Annotation> annotation) {

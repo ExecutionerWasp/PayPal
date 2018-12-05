@@ -1,4 +1,4 @@
-package org.cnfg;
+package org.model.cnfg;
 
 import lombok.NonNull;
 
