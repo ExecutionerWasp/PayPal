@@ -13,35 +13,29 @@ import java.util.stream.Stream;
 public final class FieldsResolver {
     private Map<FieldType, Field>
             clientRequiredFields;
-    private Class<?> clientClass;
+    private final String EXCEPTION_MISSING_MASSAGE
+            = "Client required clientRequiredFields:";
 
-    public FieldsResolver(@NonNull Object client) throws AccessRequiredFieldsException {
-        this.clientClass = client.getClass();
-
-        clientRequiredFields = Stream.of(clientClass.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(AccessField.class))
-                .collect(Collectors.toMap(key -> {
-                            key.setAccessible(true);
-                            return key.getAnnotation(AccessField.class).value();
-                        },
-                        value -> (Field)value));
-
+    public FieldsResolver(@NonNull Object client)
+            throws AccessRequiredFieldsException {
+        clientRequiredFields = new HashMap<>();
+        Parser.getAnnotatedFields(client.getClass(), AccessField.class)
+                .forEach(field -> clientRequiredFields
+                        .put(field.getAnnotation(AccessField.class).value(), field));
         if (clientRequiredFields.size() < FieldType.values().length) {
             List<Object> missingFields = Stream.of(FieldType.values())
                     .filter(field -> !clientRequiredFields.containsKey(field))
-                    .map(field -> field.name())
+                    .map(Enum::name)
                     .collect(Collectors.toList());
             throw new AccessRequiredFieldsException
-                    ("Client required clientRequiredFields:" + missingFields);
+                    (EXCEPTION_MISSING_MASSAGE + missingFields);
         }
     }
 
-    public Object getFieldsValue(
+    public Object getFieldValue(
             @NonNull FieldType fieldType,
-            @NonNull Object instance
-    )
-    {
-        assert(instance.getClass() == clientClass);
+            @NonNull Object instance){
+        Objects.requireNonNull(clientRequiredFields);
         try {
             instance = clientRequiredFields.get(fieldType).get(instance);
         } catch (IllegalAccessException e) {
@@ -51,8 +45,6 @@ public final class FieldsResolver {
     }
 
     public List<Object> getFieldsValues(@NonNull Object instance){
-        return Stream.of(FieldType.values())
-                .map(type -> getFieldsValue(type, instance))
-                .collect(Collectors.toList());
+        return Parser.getAnnotatedFieldsValues(instance, AccessField.class);
     }
 }

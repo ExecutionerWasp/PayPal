@@ -7,7 +7,8 @@ import org.model.annotation.MetaDate;
 public final class MetaDateResolver {
     private Class<?> annotatedClass;
 
-    public MetaDateResolver(@NonNull Object object) throws MetaDateAnnotationNotFoundException {
+    public MetaDateResolver(@NonNull Object object)
+            throws MetaDateAnnotationNotFoundException {
         if (!annotatedClass.isAnnotationPresent(MetaDate.class))
             throw new MetaDateAnnotationNotFoundException(
                     "Class:" +
