@@ -7,36 +7,30 @@ import org.model.annotation.FieldType;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class FieldsResolver {
-    private final Map<FieldType, Field>
-            clientRequiredFields = new HashMap<>();
+    private Map<FieldType, Field>
+            clientRequiredFields;
     private Class<?> clientClass;
 
-    public FieldsResolver(@NonNull Object clientClass) throws AccessRequiredFieldsException {
-        this.clientClass = clientClass.getClass();
-        for (Field f :
-                clientClass.getClass().getDeclaredFields()) {
-            if (f.isAnnotationPresent(AccessField.class)){
-                if (!clientRequiredFields.containsKey(f.getAnnotation(AccessField.class).value())){
-                    f.setAccessible(true);
-                    clientRequiredFields.put(f.getAnnotation(AccessField.class).value(), f);
-                } else {
-                    throw new AccessRequiredFieldsException(
-                            "Client required field:" +
-                                    f.getAnnotation(AccessField.class).value() +
-                                    "is exists");
-                }
-            }
-        }
+    public FieldsResolver(@NonNull Object client) throws AccessRequiredFieldsException {
+        this.clientClass = client.getClass();
+
+        clientRequiredFields = Stream.of(clientClass.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(AccessField.class))
+                .collect(Collectors.toMap(key -> {
+                            key.setAccessible(true);
+                            return key.getAnnotation(AccessField.class).value();
+                        },
+                        value -> (Field)value));
+
         if (clientRequiredFields.size() < FieldType.values().length) {
-            List<String> missingFields = new ArrayList<>();
-            for (FieldType f :
-                    FieldType.values()) {
-                if (!clientRequiredFields.containsKey(f)) {
-                    missingFields.add(f.name());
-                }
-            }
+            List<Object> missingFields = Stream.of(FieldType.values())
+                    .filter(field -> !clientRequiredFields.containsKey(field))
+                    .map(field -> field.name())
+                    .collect(Collectors.toList());
             throw new AccessRequiredFieldsException
                     ("Client required clientRequiredFields:" + missingFields);
         }
@@ -45,22 +39,20 @@ public final class FieldsResolver {
     public Object getFieldsValue(
             @NonNull FieldType fieldType,
             @NonNull Object instance
-    ) throws IllegalAccessException
+    )
     {
         assert(instance.getClass() == clientClass);
-        return clientRequiredFields.get(fieldType).get(instance);
+        try {
+            instance = clientRequiredFields.get(fieldType).get(instance);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return instance;
     }
 
     public List<Object> getFieldsValues(@NonNull Object instance){
-        List<Object> values = new ArrayList<>();
-            Arrays.asList(FieldType.values()).forEach(
-                    fieldType -> {
-                        try {
-                            values.add(getFieldsValue(fieldType, instance));
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
-                    });
-        return values;
+        return Stream.of(FieldType.values())
+                .map(type -> getFieldsValue(type, instance))
+                .collect(Collectors.toList());
     }
 }
