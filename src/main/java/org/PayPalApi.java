@@ -6,32 +6,24 @@ import org.model.ConfigManager;
 import org.model.cnfg.PayPalConfig;
 import org.model.PaymentManager;
 
+import java.util.logging.Logger;
+
 public final class PayPalApi {
-    private static PayPalApi payPal;
+    private static final Logger log = Logger.getLogger(PayPalApi.class.getName());
     private PaymentManager paymentManager;
 
-    private PayPalApi(){
-
-    }
-
-    public static PayPalApi getInstance(){
-        if (payPal == null){
-            synchronized (PayPalApi.class){
-                if (payPal == null){
-                    payPal = new PayPalApi();
-                }
-            }
-        }
-        return payPal;
-    }
-
-    public void setConfigurations(@NonNull PayPalConfig payPalConfig){
+    public PayPalApi(@NonNull PayPalConfig payPalConfig){
         ConfigManager.getInstance().init(payPalConfig);
         ConnectionManager
                 .getInstance()
-                    .configureCustomSslContext(
-                            payPalConfig
-                                    .configureCustomSslContext());
+                .configureCustomSslContext(
+                        payPalConfig
+                                .configureCustomSslContext());
+
+        log.info("["+ ConnectionManager.class.getName() +"]" +
+                payPalConfig.configureCustomSslContext());
+
+        log.info("[PaiPalApi has been initialized]");
     }
 
     public String getConfigureCancelUrl() {

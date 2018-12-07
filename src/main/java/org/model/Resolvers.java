@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class Resolvers {
-    static List<Field> getAnnotatedFields(
+    public static List<Field> getAnnotatedFields(
             @NonNull Class<?> clazz,
             @NonNull Class<? extends Annotation> annotation) {
         return Stream.of(clazz.getDeclaredFields())
@@ -18,7 +18,7 @@ public final class Resolvers {
                 .collect(Collectors.toList());
     }
 
-    static List<Object> getAnnotatedFieldsValues(
+    public static List<Object> getAnnotatedFieldsValues(
             @NonNull Object instance,
             @NonNull Class<? extends Annotation> annotation){
         return Stream.of(instance.getClass().getDeclaredFields())

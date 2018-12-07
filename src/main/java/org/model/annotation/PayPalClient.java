@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PayPalClient {
     String method() default "paypal";
-    String intent() default "order";
+    String[] intent() default "order";
 }

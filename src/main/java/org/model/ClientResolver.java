@@ -77,7 +77,7 @@ public final class ClientResolver {
         return client.getAnnotation(PayPalClient.class).method();
     }
 
-    public String getPayerIntent(){
+    public String[] getPayerIntent(){
         Objects.requireNonNull(client);
         return client.getAnnotation(PayPalClient.class).intent();
     }
